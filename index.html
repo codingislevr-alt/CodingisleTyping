@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>codingisle Minecraft Education 打字訓練場</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="game-stage" aria-labelledby="app-title">
+        <header class="topbar">
+          <img class="brand-logo" src="assets/codingisle-logo.svg" alt="codingisle logo" />
+          <div>
+            <p class="brand-mark">codingisle Minecraft Education</p>
+            <h1 id="app-title">打字訓練場</h1>
+          </div>
+          <div class="session-pill" aria-live="polite">
+            <span id="round-progress">完成 0 題</span>
+          </div>
+        </header>
+
+        <section class="control-panel" aria-label="遊戲設定">
+          <div class="segmented-control" role="group" aria-label="題目語言">
+            <button class="segment active" data-mode="mixed" type="button">中英混合</button>
+            <button class="segment" data-mode="chinese" type="button">中文</button>
+            <button class="segment" data-mode="english" type="button">英文</button>
+          </div>
+          <div class="score-weights" aria-label="得分權重">
+            <span>得分權重</span>
+            <strong id="mode-weight-current">中英混合 x1.35</strong>
+            <em>中文 x1.15</em>
+            <em>英文 x1.00</em>
+          </div>
+          <button id="rank-table-btn" class="secondary-btn" type="button">段位表</button>
+          <button id="start-btn" class="primary-btn" type="button">開始 3 分鐘挑戰</button>
+        </section>
+
+        <section class="arena" aria-label="打字練習區">
+          <div class="hud-grid">
+            <div class="hud-item">
+              <span>分數</span>
+              <strong id="score">0</strong>
+            </div>
+            <div class="hud-item">
+              <span>連擊</span>
+              <strong id="combo">0</strong>
+            </div>
+            <div class="hud-item">
+              <span>連擊加乘</span>
+              <strong id="combo-multiplier">x1.00</strong>
+            </div>
+            <div class="hud-item">
+              <span>正確率</span>
+              <strong id="accuracy">100%</strong>
+            </div>
+            <div class="hud-item">
+              <span>剩餘時間</span>
+              <strong id="time-left">03:00</strong>
+            </div>
+            <div class="hud-item">
+              <span>今日遊玩時間</span>
+              <strong id="today-play-time">00:00</strong>
+            </div>
+            <div class="hud-item">
+              <span>最高得分</span>
+              <strong id="best-score">0</strong>
+            </div>
+            <div class="hud-item">
+              <span>血量</span>
+              <strong id="health">3 / 3</strong>
+            </div>
+            <div class="hud-item">
+              <span>跳過機會</span>
+              <strong id="skips-left">3</strong>
+            </div>
+          </div>
+
+          <div class="enemy-display">
+            <img class="arena-illustration" src="assets/isle-scene.svg" alt="" />
+            <div class="danger-meter">
+              <div id="danger-fill"></div>
+            </div>
+            <div class="mob creeper">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p id="enemy-status" class="enemy-status">準備開始挑戰</p>
+          </div>
+
+          <article class="word-card">
+            <div>
+              <p id="word-category">選擇模式後開始挑戰</p>
+              <div id="target-word" class="target-word">Ready?</div>
+              <p id="word-hint" class="hidden-hint"></p>
+            </div>
+            <img class="word-illustration" src="assets/word-crate.svg" alt="" />
+          </article>
+
+          <label class="typing-field">
+            <span>你的輸入</span>
+            <div class="typing-actions">
+              <input
+                id="typing-input"
+                type="text"
+                inputmode="text"
+                autocomplete="off"
+                spellcheck="false"
+                disabled
+                placeholder="開始後在這裡輸入"
+              />
+              <button id="skip-btn" class="secondary-btn" type="button" disabled>跳過</button>
+            </div>
+          </label>
+        </section>
+
+        <section class="rank-reference" aria-label="段位參考表">
+          <div class="section-heading">
+            <h2>敵方生物段位參考</h2>
+            <p>段位一律依照每場 3 分鐘的當次得分判定。</p>
+          </div>
+          <div id="rank-list" class="rank-list"></div>
+        </section>
+
+        <section id="result-panel" class="result-panel hidden" aria-live="polite">
+          <div class="rank-badge">
+            <div id="rank-icon" class="rank-icon">S</div>
+            <div>
+              <p>你的敵方生物段位</p>
+              <h2 id="rank-name">銀魚見習生</h2>
+            </div>
+          </div>
+          <div class="result-grid">
+            <div>
+              <span>最終分數</span>
+              <strong id="final-score">0</strong>
+            </div>
+            <div>
+              <span>完成題數</span>
+              <strong id="final-words">0</strong>
+            </div>
+            <div>
+              <span>正確率</span>
+              <strong id="final-accuracy">0%</strong>
+            </div>
+            <div>
+              <span>最高連擊</span>
+              <strong id="final-combo">0</strong>
+            </div>
+            <div>
+              <span>今日遊玩時間</span>
+              <strong id="final-play-time">00:00</strong>
+            </div>
+            <div>
+              <span>歷史最高得分</span>
+              <strong id="final-best-score">0</strong>
+            </div>
+          </div>
+          <p id="rank-message" class="rank-message"></p>
+        </section>
+      </section>
+    </main>
+
+    <div id="game-over-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-card">
+        <p id="modal-kicker" class="modal-kicker">挑戰結束</p>
+        <h2 id="modal-title">本場成績</h2>
+        <div class="modal-rank">
+          <span id="modal-rank-icon">S</span>
+          <strong id="modal-rank-name">銀魚見習生</strong>
+        </div>
+        <div class="modal-grid">
+          <div>
+            <span>分數</span>
+            <strong id="modal-score">0</strong>
+          </div>
+          <div>
+            <span>完成題數</span>
+            <strong id="modal-words">0</strong>
+          </div>
+          <div>
+            <span>最高連擊</span>
+            <strong id="modal-combo">0</strong>
+          </div>
+        </div>
+        <button id="modal-close-btn" class="primary-btn" type="button">查看結果</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

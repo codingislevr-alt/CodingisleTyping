@@ -273,6 +273,7 @@ const ranks = [
   { min: 21300, name: "終界龍打字傳說", icon: "ED", message: "速度、準度、穩定度都到位，已經是傳說級。" },
   { min: 23400, name: "凋零王者", icon: "WI", message: "高壓題目也能穩穩處理，段位含金量很高。" },
   { min: 25600, name: "伏守者至尊", icon: "W", message: "codingisle 認證的最強打字冒險家。" }
+  { min: 70000, name: "創世神", icon: "W", message: "當個創世神" }
 ];
 
 const modeSettings = {

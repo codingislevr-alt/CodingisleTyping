@@ -391,6 +391,21 @@ els.typingInput.addEventListener("keydown", (event) => {
   submitAnswer();
 });
 
+els.typingInput.addEventListener("paste", (event) => {
+  event.preventDefault();
+
+  if (state.running) {
+    setEnemyStatus("不能貼上，請自己輸入喔", "warning");
+  }
+});
+
+document.addEventListener("copy", (event) => {
+  if (state.running) {
+    event.preventDefault();
+    setEnemyStatus("不能複製題目喔", "warning");
+  }
+});
+
 function startGame() {
   clearInterval(state.timer);
   state.timeLeft = GAME_SECONDS;

@@ -301,6 +301,7 @@ const state = {
   skipsLeft: 3,
   wrongStreak: 0,
   endReason: "time",
+  allowSubmit: false,
   timer: null,
   running: false,
   todayPlaySeconds: 0,
@@ -370,8 +371,14 @@ els.rankTableBtn.addEventListener("click", () => {
   document.querySelector(".rank-reference").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-els.typingInput.addEventListener("input", () => {
+els.typingInput.addEventListener("input", (event) => {
   if (!state.running) return;
+  if (!event.isTrusted) {
+    handleBlockedCheat("偵測到腳本輸入，請使用鍵盤作答");
+    els.typingInput.value = "";
+    return;
+  }
+
   const value = els.typingInput.value;
   const expectedSlice = state.currentAnswer.slice(0, value.length);
   const isWrong = value !== expectedSlice;
@@ -386,25 +393,67 @@ els.typingInput.addEventListener("input", () => {
 });
 
 els.typingInput.addEventListener("keydown", (event) => {
+  if (isBlockedShortcut(event)) {
+    event.preventDefault();
+    handleBlockedCheat("已阻擋快捷鍵，請直接輸入答案");
+    return;
+  }
+
   if (!state.running || event.key !== "Enter" || event.isComposing) return;
+  if (!event.isTrusted) {
+    handleBlockedCheat("偵測到腳本送出，請使用鍵盤作答");
+    return;
+  }
+
   event.preventDefault();
+  state.allowSubmit = true;
   submitAnswer();
 });
 
 els.typingInput.addEventListener("paste", (event) => {
   event.preventDefault();
-
-  if (state.running) {
-    setEnemyStatus("不能貼上，請自己輸入喔", "warning");
-  }
+  handleBlockedCheat("不能貼上，請自己輸入喔");
 });
 
-document.addEventListener("copy", (event) => {
-  if (state.running) {
+document.addEventListener("copy", blockPageCapture);
+document.addEventListener("cut", blockPageCapture);
+document.addEventListener("paste", blockPageCapture);
+document.addEventListener("contextmenu", blockPageCapture);
+document.addEventListener("dragstart", blockPageCapture);
+document.addEventListener("drop", blockPageCapture);
+
+document.addEventListener("keydown", (event) => {
+  if (isBlockedShortcut(event)) {
     event.preventDefault();
-    setEnemyStatus("不能複製題目喔", "warning");
+    handleBlockedCheat("已阻擋複製、原始碼或開發工具快捷鍵");
   }
 });
+
+function blockPageCapture(event) {
+  if (!state.running) return;
+  event.preventDefault();
+  handleBlockedCheat("練習中不能複製、貼上或拖拉題目");
+}
+
+function handleBlockedCheat(message) {
+  if (!state.running) return;
+  state.combo = 0;
+  els.typingInput.classList.add("wrong");
+  setEnemyStatus(message, "warning");
+  updateHud();
+}
+
+function isBlockedShortcut(event) {
+  const key = event.key.toLowerCase();
+  const withModifier = event.ctrlKey || event.metaKey;
+  const blockedModifierKeys = ["a", "c", "i", "j", "p", "s", "u", "v", "x"];
+
+  return (
+    event.key === "F12" ||
+    (withModifier && blockedModifierKeys.includes(key)) ||
+    (event.ctrlKey && event.shiftKey && ["c", "i", "j"].includes(key))
+  );
+}
 
 function startGame() {
   clearInterval(state.timer);
@@ -419,6 +468,7 @@ function startGame() {
   state.skipsLeft = 3;
   state.wrongStreak = 0;
   state.endReason = "time";
+  state.allowSubmit = false;
   state.running = true;
 
   els.modal.classList.add("hidden");
@@ -471,6 +521,12 @@ function chooseLanguage() {
 }
 
 function submitAnswer() {
+  if (!state.allowSubmit) {
+    handleBlockedCheat("送出方式無效，請按 Enter 作答");
+    return;
+  }
+  state.allowSubmit = false;
+
   const answer = els.typingInput.value.trim();
   const expected = state.currentAnswer.trim();
   state.typed += expected.length;
@@ -508,8 +564,13 @@ function submitAnswer() {
   }
 }
 
-function skipWord() {
+function skipWord(event) {
   if (!state.running || state.skipsLeft <= 0) return;
+  if (!event?.isTrusted) {
+    handleBlockedCheat("跳過方式無效，請按畫面上的跳過按鈕");
+    return;
+  }
+
   state.skipsLeft -= 1;
   state.combo = 0;
   state.wrongStreak = 0;
